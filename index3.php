@@ -32,9 +32,8 @@
             $this->max = $max;
             $this->divisor = $divisor;
 
-            while ($min <= $max){
+            while (++$min <= $max){
                 if (!($min % $divisor)) array_push($this->result, $min);
-                $min++;
             }
             echo "Числа от {$this->min} до {$this->max}, делящиеся на {$this->divisor} без остатка: " . implode(", ", $this->result) . "<br>";
         }
