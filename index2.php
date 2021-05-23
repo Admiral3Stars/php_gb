@@ -19,7 +19,7 @@
         }
     }
 
-    $first = new first(-5 , 7);
+    $first = new first(rand() , rand());
     echo $first->result . "<br>";
 ?>
 
