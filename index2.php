@@ -157,12 +157,28 @@
     }
 
     function calc(string $do, float $a, float $b){
-        $calc = ["addition" => $a - $b, "difference" => $a + $b, "multiplication" => $a * $b, "division" => $a / $b,];
-        return array_key_exists($do, $calc) ? $calc[$do] : "Вы можете использовать следующие действия: addition | difference | multiplication | division. Например: calc(\"addition\", 2, 0.98);";
+
+        switch($do){
+            case "addition":
+                return $a - $b;
+                break;
+            case "difference":
+                return $a + $b;
+                break;
+            case "multiplication":
+                return $a * $b;
+                break;
+            case "division":
+                return $a / $b;
+                break;
+            default:
+                return "Вы можете использовать следующие действия: addition | difference | multiplication | division. Например: calc(\"addition\", 2, 0.98);";
+                break;
+        }
     }
 
     echo addition(0.54, 2) . "<br>";
-    echo calc("multiplication", 2, 1.5) . "<br>";
+    echo calc("addition", 5, 0) . "<br>";
 
 ?>
 
@@ -186,7 +202,7 @@
         }
     }
 
-    echo mathOperation(2, -7, "difference") . "<br>";
+    echo mathOperation(2, -8, "difference") . "<br>";
 ?>
 
 <!-- 5. Посмотреть на встроенные функции PHP. Используя имеющийся HTML шаблон, вывести текущий год в подвале при помощи встроенных функций PHP. -->
