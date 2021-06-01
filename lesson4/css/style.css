@@ -26,9 +26,17 @@
     flex-wrap: wrap;
 }
 
+.navigation-back{
+    width: 100%;
+}
+
 .galery-item{
     margin: 10px 10px 0 0;
     max-width: 200px;
+}
+
+.galery-item-big{
+    max-width: 800px;
 }
 
 .content-form{
