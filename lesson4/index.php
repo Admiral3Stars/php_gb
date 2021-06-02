@@ -36,7 +36,15 @@
     <main class="site-content container">
 
     <div class="content-galery">
-        <?isset($_GET['id']) ? $img->getImgById($_GET['id']) : $img->getGaleryFromBase();?>
+        <?php
+            if(isset($_GET['id'])){
+                $id = (int) $_GET['id'];
+                $img->updateCount($id);
+                $img->getImgById($id);
+            }else{
+                $img->getGaleryFromBase();
+            }
+        ?>
     </div>
 
     <?php

@@ -39,6 +39,11 @@
     max-width: 800px;
 }
 
+.galery-item-count{
+    margin: 10px;
+    width: 100%;
+}
+
 .content-form{
     display: flex;
     flex-direction: column;

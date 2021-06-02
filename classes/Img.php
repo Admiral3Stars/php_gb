@@ -24,7 +24,7 @@ class Img{
     }
 
     public function getGaleryFromBase(){
-        $images = db::getDB("SELECT * FROM `images`");
+        $images = db::getDB("SELECT * FROM `images` ORDER BY `images_count` DESC, `images_id`");
         if ($images->num_rows > 0){
             foreach($images as $image){
                 echo "<a href=\"?id=" . $image['images_id'] . "\" target=\"_blank\">";
@@ -39,13 +39,17 @@ class Img{
     public function getImgById($id){
         $images = db::getDB("SELECT * FROM `images` WHERE `images_id` = $id");
         if ($images->num_rows > 0){
+            $image = $images->fetch_assoc();
             echo "<a href=\".\" class=\"navigation-back\">назад</a>";
-            foreach($images as $image){
                 echo "  <img src=\"" . $image['images_url'] . "\" alt=\"" . $image['images_name'] . "\" class=\"galery-item galery-item-big\">";
-            };
+            echo "<span class=\"galery-item-count\">Всего просмотров: {$image['images_count']}</span>";
         }else{
             echo "Что-то пошло не так";
         }
+    }
+
+    public function updateCount($id){
+        $images = db::getDB("UPDATE `images` SET `images_count` = (`images_count` + 1) WHERE `images_id` = $id");
     }
 }
 ?>
