@@ -6,6 +6,7 @@
         private $items;
         private $categories;
         private $add = [];
+        private $validTypes = ["categories", "items"];
         public $str;
 
         public function __construct($page, $do = null, $id = null){
@@ -26,14 +27,13 @@
             if ($do == "add"){
                 $this->add();
             }else if ($do == "add-off"){
-                $array = ["categories", "items"];
-                if (in_array($_POST['type'], $array) && !empty($_POST['name']) && !empty($_FILES['image'])){
+                if (in_array($_POST['type'], $this->validTypes) && !empty($_POST['name']) && !empty($_FILES['image'])){
                     $this->add['type'] = f_mysql($_POST['type']);
                     $this->add['name'] = f_mysql($_POST['name']);
-                    $this->add['price'] = ($_POST['price']) ? (float) $_POST['price'] : 0;
-                    $this->add['quantity'] = ($_POST['quantity']) ? (int) $_POST['quantity'] : 0;
-                    $this->add['discont'] = ($_POST['discont']) ? (int) $_POST['discont'] : 0;
-                    $this->add['description'] = ($_POST['description']) ? f_mysql($_POST['description']) : "";
+                    $this->add['price'] = (!empty($_POST['price'])) ? (float) $_POST['price'] : 0;
+                    $this->add['quantity'] = (!empty($_POST['quantity'])) ? (int) $_POST['quantity'] : 0;
+                    $this->add['discont'] = (!empty($_POST['discont'])) ? (int) $_POST['discont'] : 0;
+                    $this->add['description'] = (!empty($_POST['description'])) ? f_mysql($_POST['description']) : "";
                     $this->add['checked'] = (!empty($_POST['cat_id'])) ? array_map('intval', $_POST['cat_id']) : null;
                     $this->addFile();
                     if (empty($_SESSION["error"])) $this->addToBase();
@@ -44,7 +44,8 @@
             }else if ($do == "update"){
                 $this->update();
             }else if ($do == "delete"){
-                $this->delete();
+                $this->preDelete();
+                header("location: .");
             }else if ($this->table){
                 $this->getTable();
             }
@@ -109,7 +110,15 @@
                 }else{
                     $_SESSION['error'] = "Товар не добавлен";
                 }
+            }else if ($this->add['type'] == "categories"){
+                $sql = "INSERT INTO `categories`(`categories_name`, `categories_image`) VALUES ('{$this->add['name']}','{$this->add['image']}');";
+                if (db::result($sql)){
+                    $_SESSION['good'] = "Категория добавлена";
+                }else{
+                    $_SESSION['error'] = "Категория не добавлена";
+                }
             }
+            
         }
         public function update(){
             if ($this->page['type'] == "items"){
@@ -149,8 +158,33 @@
                 $this->str .= "</form>";
             }
         }
+        public function preDelete(){
+            if (in_array($this->page['type'], $this->validTypes)){
+                $result = db::result("SELECT `{$this->page['type']}_image` as `img` FROM `{$this->page['type']}` WHERE `{$this->page['type']}_id` = {$this->page['id']};");
+                $filtename = $result->fetch_assoc();
+                if(isset($filtename['img'])){
+                    $this->deleteFile($filtename['img']);
+                    if ($this->page['type'] == "items"){
+                        if (db::result("DELETE FROM `itemscategories` WHERE `items_id` = {$this->page['id']};")){
+                            $this->delete();
+                        }else{
+                            $_SESSION['error'] = "{$this->page['name']} не удалён.";
+                        }
+                    }else if ($this->page['type'] == "categories"){
+                        $this->delete();
+                        if (isset($_SESSION['error'])) $_SESSION['error'] .= " Перенесите товары из данной категории в другие и повторите попытку!";
+                    }
+                }else{
+                    $_SESSION['error'] = "Что-то пошло не так";
+                }
+            }
+        }
         public function delete(){
-            $this->str = "delete";
+            if (db::result("DELETE FROM `{$this->page['type']}` WHERE `{$this->page['type']}_id` = {$this->page['id']};")){
+                $_SESSION['good'] = "{$this->page['name']} удалён.";
+            }else{
+                $_SESSION['error'] = "{$this->page['name']} не удалён.";
+            }
         }
         public function addFile(){
             if (isset($_FILES['image']) && $_FILES['image']['error'] == 0){
@@ -169,6 +203,9 @@
             }else{
                 $_SESSION['error'] = "Что-то пошло не так.";
             }
-        } 
+        }
+        public function deleteFile($filename){
+            unlink("../images/{$this->page['type']}/" . $filename);
+        }
     }
 ?>
