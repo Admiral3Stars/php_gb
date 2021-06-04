@@ -1,0 +1,72 @@
+table, th, td{
+    border: 1px solid lightgrey;
+    border-collapse: collapse;
+}
+label{
+    display: flex;
+    justify-content: space-between;
+}
+label, input, textarea{
+    margin: 0 0 10px 0;
+}
+.admin{
+    width: 100%;
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 16px;
+}
+.admin-content{
+    display: flex;
+    margin: 0 auto;
+    max-width: 1290px;
+}
+.content-menu{
+    display: flex;
+    flex-direction: column;
+    padding: 5px 10px;
+    box-sizing: border-box;
+    height: 100vh;
+    background-color: bisque;
+}
+.menu-item{
+    margin: 0 0 10px 0;
+    padding: 5px;
+    border-bottom: 1px dashed white;
+    text-decoration: none;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 20px;
+    color: black;
+    cursor: pointer;
+}
+.menu-item:hover{
+    background-color: white;
+    border-radius: 25px;
+    transition: 400ms;
+}
+.menu-item:active{
+    background-color: bisque;
+}
+.content-forms{
+    min-width: 350px;
+    padding: 5px 10px;
+    box-sizing: border-box;
+}
+.standart-table td{
+    padding: 3px 5px;
+    box-sizing: border-box;
+    text-align: center;
+}
+.forms-edit{
+    display: flex;
+    flex-direction: column;
+    margin: 0 10px;
+}
+.edit-categories-list{
+    display: flex;
+    flex-direction: column;
+    margin: 0 0 10px 0;
+    padding: 5px;
+    box-sizing: border-box;
+    height: 100px;
+    overflow-y: auto;
+    border: 1px solid grey;
+}
