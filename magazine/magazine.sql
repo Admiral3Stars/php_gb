@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Хост: 127.0.0.1:3307
--- Время создания: Июн 04 2021 г., 17:18
+-- Время создания: Июн 05 2021 г., 12:22
 -- Версия сервера: 8.0.19
 -- Версия PHP: 8.0.1
 
@@ -147,19 +147,19 @@ ALTER TABLE `menu`
 -- AUTO_INCREMENT для таблицы `categories`
 --
 ALTER TABLE `categories`
-  MODIFY `categories_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `categories_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT для таблицы `items`
 --
 ALTER TABLE `items`
-  MODIFY `items_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=30;
+  MODIFY `items_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
 
 --
 -- AUTO_INCREMENT для таблицы `itemscategories`
 --
 ALTER TABLE `itemscategories`
-  MODIFY `itemscategories_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=24;
+  MODIFY `itemscategories_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=30;
 
 --
 -- AUTO_INCREMENT для таблицы `menu`
