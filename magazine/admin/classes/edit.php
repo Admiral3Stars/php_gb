@@ -27,7 +27,7 @@
             if ($do == "add"){
                 $this->add();
             }else if ($do == "add-off"){
-                if (in_array($_POST['type'], $this->validTypes) && !empty($_POST['name']) && !empty($_FILES['image'])){
+                if (in_array($_POST['type'], $this->validTypes) && !empty($_POST['name']) && isset($_FILES['image']) && $_FILES['image']['error'] == 0){
                     $this->add['type'] = f_mysql($_POST['type']);
                     $this->add['name'] = f_mysql($_POST['name']);
                     $this->add['price'] = (!empty($_POST['price'])) ? (float) $_POST['price'] : 0;
@@ -41,11 +41,40 @@
                     $_SESSION["error"] = "Не заполнены обязательные поля";
                 }
                 header("location: .");
+                exit;
+            }else if ($do == "update-off"){
+                if (in_array($_POST['type'], $this->validTypes) && !empty($_POST['name'])){
+                    $this->add['type'] = f_mysql($_POST['type']);
+                    $this->add['name'] = f_mysql($_POST['name']);
+                    $this->add['price'] = (!empty($_POST['price'])) ? (float) $_POST['price'] : 0;
+                    $this->add['quantity'] = (!empty($_POST['quantity'])) ? (int) $_POST['quantity'] : 0;
+                    $this->add['discont'] = (!empty($_POST['discont'])) ? (int) $_POST['discont'] : 0;
+                    $this->add['description'] = (!empty($_POST['description'])) ? f_mysql($_POST['description']) : "";
+                    $this->add['checked'] = (!empty($_POST['cat_id'])) ? array_map('intval', $_POST['cat_id']) : null;
+                    if (isset($_FILES['image']) && $_FILES['image']['error'] == 0){
+                        $this->addFile();
+                        if (empty($_SESSION["error"])){
+                            $result = db::result("SELECT `{$this->page['type']}_image` as `img` FROM `{$this->page['type']}` WHERE `{$this->page['type']}_id` = {$this->page['id']};");
+                            $filtename = $result->fetch_assoc();
+                            if(isset($filtename['img'])){
+                                $this->deleteFile($filtename['img']);
+                            }else{
+                                $_SESSION['error'] = "Что-то пошло не так";
+                            }
+                        }
+                    }
+                    if (empty($_SESSION["error"])) $this->updateToBase();
+                }else{
+                    $_SESSION["error"] = "Не заполнены обязательные поля";
+                }
+                header("location: .");
+                exit;
             }else if ($do == "update"){
                 $this->update();
             }else if ($do == "delete"){
                 $this->preDelete();
                 header("location: .");
+                exit;
             }else if ($this->table){
                 $this->getTable();
             }
@@ -124,10 +153,11 @@
             if ($this->page['type'] == "items"){
                 $this->items = db::result("SELECT * FROM `items` WHERE `items_id` = {$this->page['id']};");
                 $item = $this->items->fetch_assoc();
-                $this->str = "<form action=\"?page={$this->page['url']}&do=update-off\" method=\"post\" class=\"forms-edit\" enctype=\"multipart/form-data\">";
+                $this->str = "<form action=\"?page={$this->page['url']}&do=update-off&id={$this->page['id']}\" method=\"post\" class=\"forms-edit\" enctype=\"multipart/form-data\">";
                     $this->str .= "<input type=\"hidden\" name=\"id\" value=\"{$this->page['id']}\">";
                     $this->str .= "<input type=\"hidden\" name=\"type\" value=\"items\">";
                     $this->str .= "<input type=\"text\" name=\"name\" value=\"{$item['items_name']}\" required>";
+                    $this->str .= "<label>Цена (руб.): <input type=\"number\" step=\"0.01\" name=\"price\" value=\"{$item['items_price']}\"></label>";
                     $this->str .= "<label>Кол-во (шт.): <input type=\"number\" name=\"quantity\" value=\"{$item['items_quantity']}\"></label>";
                     $this->str .= "<label>Скидка (%): <input type=\"number\" name=\"discont\" value=\"{$item['items_discont']}\"></label>";
                     $this->str .= "<input type=\"file\" name=\"image\">";
@@ -149,7 +179,7 @@
             }else if ($this->page['type'] == "categories"){
                 $this->categories = db::result("SELECT * FROM `categories` WHERE `categories_id` = {$this->page['id']};");
                 $category = $this->categories->fetch_assoc();
-                $this->str = "<form action=\"?page={$this->page['url']}&do=update-off\" method=\"post\" class=\"forms-edit\" enctype=\"multipart/form-data\">";
+                $this->str = "<form action=\"?page={$this->page['url']}&do=update-off&id={$this->page['id']}\" method=\"post\" class=\"forms-edit\" enctype=\"multipart/form-data\">";
                     $this->str .= "<input type=\"hidden\" name=\"id\" value=\"{$this->page['id']}\">";
                     $this->str .= "<input type=\"hidden\" name=\"type\" value=\"categories\">";
                     $this->str .= "<input type=\"text\" name=\"name\" value=\"{$category['categories_name']}\">";
@@ -157,6 +187,51 @@
                     $this->str .= "<input type=\"submit\" value=\"обновить\">";
                 $this->str .= "</form>";
             }
+        }
+        public function updateToBase(){
+            if ($this->add['type'] == "items"){
+                $sql = "UPDATE `items` SET ";
+                $sql .= "`items_name` = '{$this->add['name']}', ";
+                $sql .= "`items_price` = {$this->add['price']}, ";
+                $sql .= "`items_quantity` = {$this->add['quantity']}, ";
+                $sql .= "`items_discont` = {$this->add['discont']}, ";
+                if (isset($this->add['image'])) $sql .= "`items_image` = '{$this->add['image']}', ";
+                $sql .= "`items_description` = '{$this->add['description']}' ";
+                $sql .= "WHERE `items_id` = {$this->page['id']};";
+                if (db::result($sql)){
+                    $sql = "DELETE FROM `itemscategories` WHERE `items_id` = {$this->page['id']};";
+                    if (db::result($sql)){
+                        if ($this->add['checked']){
+                            $sql = "INSERT INTO `itemscategories`(`items_id`, `categories_id`) VALUES ";
+                            foreach ($this->add['checked'] as $val){
+                                $sql .= "({$this->page['id']}, $val), ";
+                            }
+                            $sql = substr($sql, 0, -2) . ";";
+                            if (db::result($sql)){
+                                $_SESSION['good'] = "Товар обновлен";
+                            }else{
+                                $_SESSION['error'] = "Товар не обновлен";
+                            }
+                        }else{
+                            $_SESSION['good'] = "Товар обновлен";
+                        }
+                    }else{
+                        $_SESSION['error'] = "Товар не обновлен";
+                    }
+                }else{
+                    $_SESSION['error'] = "Товар не обновлен";
+                }
+            }else if ($this->add['type'] == "categories"){
+                $sql = "UPDATE `categories` SET ";
+                $sql .= "`categories_name` = '{$this->add['name']}' ";
+                if (isset($this->add['image'])) $sql .= ", `categories_image` = '{$this->add['image']}' ";
+                $sql .= "WHERE `categories_id` = {$this->page['id']};";
+                if (db::result($sql)){
+                    $_SESSION['good'] = "Категория обновлена";
+                }else{
+                    $_SESSION['error'] = "Категория не обновлена";
+                }
+            } 
         }
         public function preDelete(){
             if (in_array($this->page['type'], $this->validTypes)){
@@ -187,21 +262,17 @@
             }
         }
         public function addFile(){
-            if (isset($_FILES['image']) && $_FILES['image']['error'] == 0){
-                if (preg_match("/.+(\.jpg)/",$_FILES['image']['name'])){
-                    $this->add['image'] = $name = $_FILES['image']['name'];
-                    $images = db::result("SELECT * FROM `{$this->add['type']}` WHERE `{$this->add['type']}_image` LIKE '$name'");
-                    if ($images->num_rows == 0){
-                    move_uploaded_file($_FILES['image']['tmp_name'], "../images/{$this->add['type']}/" . $_FILES['image']['name']);
-                    $_SESSION['good'] = "Файл добавлен в галерею.";
-                }else{
-                    $_SESSION['error'] = "Файл уже был загружен ранее.";
-                }
-                }else{
-                    $_SESSION['error'] = "Не верный формат файла.";
-                }
+            if (preg_match("/.+(\.jpg)/",$_FILES['image']['name'])){
+                $this->add['image'] = $name = $_FILES['image']['name'];
+                $images = db::result("SELECT * FROM `{$this->add['type']}` WHERE `{$this->add['type']}_image` LIKE '$name'");
+                if ($images->num_rows == 0){
+                move_uploaded_file($_FILES['image']['tmp_name'], "../images/{$this->add['type']}/" . $_FILES['image']['name']);
+                $_SESSION['good'] = "Файл добавлен в галерею.";
             }else{
-                $_SESSION['error'] = "Что-то пошло не так.";
+                $_SESSION['error'] = "Файл уже был загружен ранее.";
+            }
+            }else{
+                $_SESSION['error'] = "Не верный формат файла.";
             }
         }
         public function deleteFile($filename){
