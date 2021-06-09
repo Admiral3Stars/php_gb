@@ -1,0 +1,104 @@
+.site{
+    width: 100%;
+    font-family: 'Times New Roman', Times, serif;
+    font-size: 16px;
+}
+.site-content{
+    max-width: 1290px;
+    margin: 0 auto;
+}
+.content-header{
+    display: block;
+    margin: 10px 0 0 0;
+    font-size: 24px;
+}
+.content-catalog{
+    display: flex;
+    flex-wrap: wrap;
+    margin: 10px 0;
+}
+.catalog-item{
+    position: relative;
+    padding: 5px 10px 0 0;
+    max-width: 250px;
+    text-decoration: none;
+    color: black;
+}
+.catalog-item-header{
+    display: block;
+    text-align: center;
+}
+.content-navigation-back{
+    display: block;
+    margin: 5px 0 0 0;
+    max-width: 100px;
+    text-align: center;
+    padding: 5px 10px;
+    box-sizing: border-box;
+    border-radius: 10px;
+    text-decoration: none;
+    color:black;
+    background-color: chartreuse;
+    font-weight: bold;
+    cursor: pointer;
+}
+.content-navigation-back::before{
+    content: "<<< ";
+    font-size: 10px;
+}
+
+.content-navigation-back:hover{
+    background-color: gold;
+}
+
+.content-navigation-back:hover{
+    color:white;
+}
+
+.content-navigation-back:active{
+    background-color: chartreuse;
+}
+
+.content-navigation-back:active{
+    color:black;
+}
+
+.catalog-item-prices{
+    text-align: center;
+}
+.catalog-item-old-price{
+    color: red;
+    text-decoration: line-through;
+}
+.catalog-item-price{
+    font-weight: bold;
+}
+.catalog-item-old-price::after, .catalog-item-price::after{
+    content: "руб.";
+}
+.catalog-item-quantity{
+    display: block;
+    text-align: center;
+}
+.catalog-item-discont{
+    position: absolute;
+    top: 10px;
+    left: 5px;
+    background-color: greenyellow;
+    padding: 10px;
+    border-radius: 25px;
+    box-sizing: border-box;
+}
+.catalog-item-discont::before{
+    content: "- ";
+}
+.catalog-item-discont::after{
+    content: "%";
+}
+.catalog-image-block{
+    position: relative;
+}
+.catalog-info-block{
+    padding: 0 10px;
+    box-sizing: border-box;
+}

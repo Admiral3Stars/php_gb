@@ -1,0 +1,78 @@
+.error{
+    font-weight: bold;
+    color: red;
+}
+
+.error::before{
+    content: "Ошибка! ";
+}
+
+.good{
+    font-weight: bold;
+    color: green;
+}
+
+.site{
+    font-family: 'Courier New', Courier, monospace;
+}
+
+.container{
+    margin: 0 auto;
+    width: 1240px;
+}
+
+.content-galery{
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.navigation-back{
+    width: 100%;
+}
+
+.galery-item{
+    margin: 10px 10px 0 0;
+    max-width: 200px;
+}
+
+.galery-item-big{
+    max-width: 800px;
+}
+
+.galery-item-count{
+    margin: 10px;
+    width: 100%;
+}
+
+.content-form{
+    display: flex;
+    flex-direction: column;
+}
+
+.form-submit{
+    padding: 7px 11px;
+}
+
+.dowload-file-input{
+    padding: 4px 6px;
+}
+
+.form-submit, .dowload-file-input{
+    box-sizing: border-box;
+    background-color: greenyellow;
+    color: black;
+    border-radius: 5px;
+    border: none;
+    outline: none;
+    cursor: pointer;
+}
+
+.form-submit:hover{
+    background-color: green;
+    color: white;
+}
+
+.form-submit:active{
+    background-color: greenyellow;
+    color: black;
+}
