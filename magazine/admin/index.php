@@ -1,13 +1,23 @@
 <?php
-// Подгружаем классы и функции
+    session_start();
     include_once "../funcs/funcs.php";
     include_once "../classes/db.php";
     spl_autoload_register(function ($name){
         include_once "classes/$name.php";
     });
-    
-    session_start();
 
+    $autorisation = new Autorisation;
+    if (isset($_GET['login']) && $_GET['login'] == "yes" && isset($_POST['login']) && isset($_POST['password'])){
+        $autorisation->loginOn(f_mysql($_POST['login']), $_POST['password']);
+        header("location: .");
+        exit;
+    }
+    if (isset($_GET['logout'])){
+        unset($_SESSION['user']);
+        unset($_SESSION['access']);
+        header("location: .");
+        exit;
+    }
     $do = isset($_GET['do']) ? filter($_GET['do']) : null;
     $id = isset($_GET['id']) ? (int) $_GET['id'] : null;
 
@@ -31,6 +41,9 @@
     </header>
 
     <main class="admin-content">
+    <?php
+        if (isset($_SESSION['user']) && $_SESSION['access'] > 4){
+    ?>
         <nav class="content-menu">
             <?php
                 $menu = db::result("SELECT * FROM `menu`;");
@@ -53,6 +66,21 @@
                 if (isset($edit)) echo $edit->str;
             ?>
         </div>
+    <?php
+        }else{
+            if (isset($_SESSION['error'])){
+                echo "<p class=\"error\">" . $_SESSION['error'] . "</p>";
+                unset($_SESSION['error']);
+            }
+    
+            if (isset($_SESSION['good'])){
+                echo "<p class=\"good\">" . $_SESSION['good'] . "</p>";
+                unset($_SESSION['good']);
+            }
+            if (isset($edit)) echo $edit->str;
+            echo $autorisation->login();
+        }
+    ?>
     </main>
         
     <footer class="admin-footer">

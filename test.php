@@ -1,5 +1,5 @@
 <?php
-    $b = "Привет медвед";
-    $a = print($b); // работает
-    var_dump($a); // int(1);
+$count = 3;
+$string = 'У нас всего есть $count яблока.';
+echo $string;
 ?>
