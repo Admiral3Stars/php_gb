@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Хост: 127.0.0.1:3307
--- Время создания: Июн 05 2021 г., 12:22
+-- Время создания: Июн 15 2021 г., 16:33
 -- Версия сервера: 8.0.19
 -- Версия PHP: 8.0.1
 
@@ -20,6 +20,27 @@ SET time_zone = "+00:00";
 --
 -- База данных: `magazine`
 --
+
+-- --------------------------------------------------------
+
+--
+-- Структура таблицы `cart`
+--
+
+CREATE TABLE `cart` (
+  `cart_id` int NOT NULL,
+  `users_id` int DEFAULT NULL,
+  `cart_session` varchar(255) NOT NULL,
+  `items_id` int NOT NULL,
+  `cart_quantity` int NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Дамп данных таблицы `cart`
+--
+
+INSERT INTO `cart` (`cart_id`, `users_id`, `cart_session`, `items_id`, `cart_quantity`) VALUES
+(15, NULL, '678r6441mld4itka8u11lrso2uft9o18', 8, 3);
 
 -- --------------------------------------------------------
 
@@ -107,11 +128,86 @@ CREATE TABLE `menu` (
 
 INSERT INTO `menu` (`menu_id`, `menu_name`, `menu_link`) VALUES
 (1, 'Редактор товаров', '?page=reditem'),
-(2, 'Редактор категорий', '?page=redcat');
+(2, 'Редактор категорий', '?page=redcat'),
+(3, 'Заказы', '?page=orders'),
+(4, 'Выйти', '?logout');
+
+-- --------------------------------------------------------
+
+--
+-- Структура таблицы `orders`
+--
+
+CREATE TABLE `orders` (
+  `orders_id` int NOT NULL,
+  `orders_fio` varchar(255) NOT NULL,
+  `orders_phone` varchar(50) NOT NULL,
+  `orders_address` varchar(255) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Дамп данных таблицы `orders`
+--
+
+INSERT INTO `orders` (`orders_id`, `orders_fio`, `orders_phone`, `orders_address`) VALUES
+(1, 'Тимур Кириченко', '89051430725', 'Дружбы 1-55'),
+(2, 'Тимур Кириченко', '89051430725', 'Дружбы 1-55'),
+(3, 'Тимур Кириченко', '89051430725', 'Дружбы 1-55');
+
+-- --------------------------------------------------------
+
+--
+-- Структура таблицы `ordersitems`
+--
+
+CREATE TABLE `ordersitems` (
+  `orders_id` int NOT NULL,
+  `items_id` int NOT NULL,
+  `ordersitems_quantity` int NOT NULL,
+  `ordersitems_sum` decimal(8,2) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Дамп данных таблицы `ordersitems`
+--
+
+INSERT INTO `ordersitems` (`orders_id`, `items_id`, `ordersitems_quantity`, `ordersitems_sum`) VALUES
+(1, 8, 0, '38.67'),
+(2, 8, 0, '12.89'),
+(2, 9, 0, '42.00'),
+(3, 8, 3, '38.67'),
+(3, 9, 4, '56.00');
+
+-- --------------------------------------------------------
+
+--
+-- Структура таблицы `users`
+--
+
+CREATE TABLE `users` (
+  `users_id` int NOT NULL,
+  `users_name` varchar(255) NOT NULL,
+  `users_password` varchar(255) NOT NULL,
+  `users_access` int NOT NULL DEFAULT '0'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Дамп данных таблицы `users`
+--
+
+INSERT INTO `users` (`users_id`, `users_name`, `users_password`, `users_access`) VALUES
+(3, 'Admiral', '$2y$10$UUf/lu.VeBUD0O.fKz0Qhux3RSh5fRP/zg.g9kjQPSHYiZhZJsSYi', 5);
 
 --
 -- Индексы сохранённых таблиц
 --
+
+--
+-- Индексы таблицы `cart`
+--
+ALTER TABLE `cart`
+  ADD PRIMARY KEY (`cart_id`),
+  ADD KEY `items_id` (`items_id`);
 
 --
 -- Индексы таблицы `categories`
@@ -140,8 +236,33 @@ ALTER TABLE `menu`
   ADD PRIMARY KEY (`menu_id`);
 
 --
+-- Индексы таблицы `orders`
+--
+ALTER TABLE `orders`
+  ADD PRIMARY KEY (`orders_id`);
+
+--
+-- Индексы таблицы `ordersitems`
+--
+ALTER TABLE `ordersitems`
+  ADD PRIMARY KEY (`orders_id`,`items_id`),
+  ADD KEY `items_id` (`items_id`);
+
+--
+-- Индексы таблицы `users`
+--
+ALTER TABLE `users`
+  ADD PRIMARY KEY (`users_id`);
+
+--
 -- AUTO_INCREMENT для сохранённых таблиц
 --
+
+--
+-- AUTO_INCREMENT для таблицы `cart`
+--
+ALTER TABLE `cart`
+  MODIFY `cart_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
 
 --
 -- AUTO_INCREMENT для таблицы `categories`
@@ -165,11 +286,29 @@ ALTER TABLE `itemscategories`
 -- AUTO_INCREMENT для таблицы `menu`
 --
 ALTER TABLE `menu`
-  MODIFY `menu_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `menu_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+
+--
+-- AUTO_INCREMENT для таблицы `orders`
+--
+ALTER TABLE `orders`
+  MODIFY `orders_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
+-- AUTO_INCREMENT для таблицы `users`
+--
+ALTER TABLE `users`
+  MODIFY `users_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- Ограничения внешнего ключа сохраненных таблиц
 --
+
+--
+-- Ограничения внешнего ключа таблицы `cart`
+--
+ALTER TABLE `cart`
+  ADD CONSTRAINT `cart_ibfk_1` FOREIGN KEY (`items_id`) REFERENCES `items` (`items_id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 --
 -- Ограничения внешнего ключа таблицы `itemscategories`
@@ -177,6 +316,13 @@ ALTER TABLE `menu`
 ALTER TABLE `itemscategories`
   ADD CONSTRAINT `itemscategories_ibfk_1` FOREIGN KEY (`items_id`) REFERENCES `items` (`items_id`) ON DELETE RESTRICT ON UPDATE CASCADE,
   ADD CONSTRAINT `itemscategories_ibfk_2` FOREIGN KEY (`categories_id`) REFERENCES `categories` (`categories_id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+
+--
+-- Ограничения внешнего ключа таблицы `ordersitems`
+--
+ALTER TABLE `ordersitems`
+  ADD CONSTRAINT `ordersitems_ibfk_1` FOREIGN KEY (`items_id`) REFERENCES `items` (`items_id`) ON DELETE RESTRICT ON UPDATE CASCADE,
+  ADD CONSTRAINT `ordersitems_ibfk_2` FOREIGN KEY (`orders_id`) REFERENCES `orders` (`orders_id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

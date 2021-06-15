@@ -51,8 +51,10 @@ class Catalog{
             echo "<span class=\"content-header\">{$cat['categories_name']}</span>";
             echo "<div class=\"content-catalog\">";
                 while($item = $items->fetch_assoc()){
-                    echo "<a href=\"?cat={$this->cat}&item={$item['items_id']}\" class=\"catalog-item\">";
-                        echo "<img width=\"{$this->image['width']}\" height=\"{$this->image['height']}\" src=\"{$item['items_image']}\" alt=\"{$item['items_name']}\" class=\"catalog-item-image\">";
+                    echo "<div class=\"catalog-item\">";
+                        echo "<a href=\"?cat={$this->cat}&item={$item['items_id']}\" class=\"catalog-item\">";
+                            echo "<img width=\"{$this->image['width']}\" height=\"{$this->image['height']}\" src=\"{$item['items_image']}\" alt=\"{$item['items_name']}\" class=\"catalog-item-image\">";
+                        echo "</a>";
                         echo "<span class=\"catalog-item-header\">{$item['items_name']}</span>";
                         echo "<div class=\"catalog-item-prices\">";
                             if($item['items_discont'] > 0){
@@ -65,10 +67,15 @@ class Catalog{
                         echo "</div>";
                         if ($item['items_quantity'] > 0){
                             echo "<span class=\"catalog-item-quantity\">На складе: {$item['items_quantity']} шт.</span>";
+                            echo "<form action=\"?bye={$item['items_id']}\" method=\"post\" class=\"toCart\">";
+                                echo "<input type=\"hidden\" name=\"cat\" value=\"{$this->cat}\">";
+                                echo "<input type=\"number\" name=\"quntity\" min=\"1\" max=\"{$item['items_quantity']}\" value=\"1\" class=\"toCart-quantity\">";
+                                echo "<input type=\"submit\" class=\"toCart-button\" value=\"в корзину\">";
+                            echo "</form>";
                         }else{
                             echo "<span class=\"catalog-item-quantity\">Нет на складе.</span>";
                         }
-                    echo "</a>";
+                    echo "</div>";
                 }
             echo "</div>";
         }else{
@@ -102,6 +109,11 @@ class Catalog{
                     echo "</div>";
                     if ($item['items_quantity'] > 0){
                         echo "<span class=\"info-block-quantity\">На складе: {$item['items_quantity']} шт.</span>";
+                        echo "<form action=\"?bye={$item['items_id']}\" method=\"post\" class=\"toCart\">";
+                            echo "<input type=\"hidden\" name=\"cat\" value=\"{$this->cat}\">";
+                            echo "<input type=\"number\" name=\"quntity\" min=\"1\" max=\"{$item['items_quantity']}\" value=\"1\" class=\"toCart-quantity\">";
+                            echo "<input type=\"submit\" class=\"toCart-button\" value=\"в корзину\">";
+                        echo "</form>";
                     }else{
                         echo "<span class=\"info-block-quantity\">Нет на складе.</span>";
                     }
