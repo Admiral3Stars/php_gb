@@ -7,7 +7,7 @@
         private $categories;
         private $add = [];
         private $validTypes = ["categories", "items"];
-        public $str;
+        public $str = "";
 
         public function __construct($page, $do = null, $id = null){
             $this->page['url'] = $page;
@@ -23,6 +23,9 @@
                 $this->table = $this->categories;
                 $this->page['name'] = "каталог";
                 $this->page['type'] = "categories";
+            }
+            if ($page == "orders"){
+                $this->getOrderList();
             }
             if ($do == "add"){
                 $this->add();
@@ -277,6 +280,13 @@
         }
         public function deleteFile($filename){
             unlink("../images/{$this->page['type']}/" . $filename);
+        }
+        public function getOrderList(){
+            $ordered = db::result("SELECT * FROM `orders` LEFT JOIN `ordersitems` ON `orders`.`orders_id` = `ordersitems`.`orders_id` LEFT JOIN `items` ON `items`.`items_id` = `ordersitems`.`items_id`;");
+            while($item = $ordered->fetch_assoc()){
+                $this->str .= "Заказали {$item['items_name']}. {$item['ordersitems_quantity']} штук на сумму {$item['ordersitems_sum']} ({$item['orders_fio']} | {$item['orders_phone']})<br>";
+            }
+            return $this->str;
         }
     }
 ?>

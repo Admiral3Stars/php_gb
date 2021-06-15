@@ -31,7 +31,8 @@ class Cart{
                     $str .= "<a href=\"?cart=delete&id={$item['cart_id']}\" class=\"cart-delId\">удалить.</a>";
                 $str .= "</div>";
             }
-            $str .= "<a href=\"?clearCart\" class=\"cart-del\">очистить корзину.</a>";
+            $str .= "<a href=\"?clearCart\" class=\"cart-del\">очистить корзину.</a><br>";
+            $str .= "<a href=\"?order\" class=\"order\">Оформить заказ.</a>";
         }else{
             $str .= "Корзина пуста";
         }
@@ -52,6 +53,31 @@ class Cart{
 
     public function clear(){
         db::result("DELETE FROM `cart` WHERE `cart_session` LIKE '{$this->sessionId}';");
+    }
+
+    public function getOrderPage(){
+        $str = "<a href=\".\" class=\"content-navigation-back\">главная</a>";
+        $str .= "<form action=\"?order=yes\" method=\"post\" class=\"orderform\">";
+            $str .= "<input type=\"text\" name=\"name\" class=\"orderform-name\" placeholder=\"FIO\">";
+            $str .= "<input type=\"text\" name=\"phone\" class=\"orderform-password\" placeholder=\"phone\">";
+            $str .= "<input type=\"text\" name=\"address\" class=\"orderform-password\" placeholder=\"address\">";
+            $str .= "<input type=\"submit\" class=\"orderform-button\" value=\"заказать\">";
+        $str .= "</form>";
+        return $str;
+    }
+
+    public function orderOn($name, $phone, $address){
+        $last = db::lastId("INSERT INTO `orders`(`orders_fio`, `orders_phone`, `orders_address`) VALUES ('$name', '$phone', '$address')");
+        if ($last > 0){
+            foreach ($this->cart as $item){
+                db::result("INSERT INTO `ordersitems`(`orders_id`, `items_id`, `ordersitems_quantity`, `ordersitems_sum`) VALUES ($last, {$item['items_id']}, {$item['cart_quantity']}, {$item['sum']})");
+            }
+            if(db::result("DELETE FROM `cart` WHERE `cart_session` LIKE '{$this->sessionId}'")){
+                $_SESSION['good'] = "Ваш заказ принят";
+            }
+        }else{
+            $_SESSION['error'] = "Не удалось оформить заказ";
+        }
     }
 }
 ?>

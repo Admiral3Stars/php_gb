@@ -30,6 +30,11 @@
         header("location: ?login");
         exit;
     }
+    if (isset($_GET['order']) && $_GET['order'] == "yes" && isset($_POST['name']) && isset($_POST['phone']) && isset($_POST['address'])){
+        $cart->orderOn(f_mysql($_POST['name']), f_mysql($_POST['phone']), f_mysql($_POST['address']));
+        header("location: .");
+        exit;
+    }
     if (isset($_GET['register']) && $_GET['register'] == "yes" && isset($_POST['login']) && isset($_POST['password']) && isset($_POST['rePassword'])){
         if ($_POST['password'] != $_POST['rePassword']){
             $_SESSION['error'] = "Пароли не совпадают";
@@ -79,6 +84,8 @@
                 echo $autorisation->register();
             }else if (isset($_GET['login']) && empty($_SESSION['user'])){
                 echo $autorisation->login();
+            }else if (isset($_GET['order'])){
+                echo $cart->getOrderPage();
             }else if (isset($_GET['cart'])){
                 echo $cart->getCart();
             }else{
